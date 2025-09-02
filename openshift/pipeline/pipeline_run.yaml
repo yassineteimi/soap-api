@@ -1,0 +1,30 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: soap-api-pipelinerun
+  namespace: soap-api
+spec:
+  pipelineRef:
+    name: soap-api-pipeline
+  workspaces:
+  - name: shared-workspace
+    volumeClaimTemplate:
+      metadata: {name: soap-api-ws-pvc}
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources: {requests: {storage: 1Gi}}
+  - name: maven-settings
+    volumeClaimTemplate:
+      metadata: {name: soap-api-mvn-pvc}
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources: {requests: {storage: 100Mi}}
+  params:
+  - name: git-url
+    value: https://github.com/myuser/soap-api.git
+  - name: git-revision
+    value: main
+  - name: IMAGE
+    value: image-registry.openshift-image-registry.svc:5000/soap-api/soap-api:latest
+  - name: deployment-name
+    value: soap-api

@@ -1,0 +1,32 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: maven
+spec:
+  description: Run a Maven build (package) on the Java project.
+  workspaces:
+  - name: source
+    description: Maven project source code (workspace)
+  - name: maven-settings
+    description: Workspace for custom Maven settings (optional)
+  params:
+  - name: GOALS
+    type: array
+    default: ["package"]
+    description: Maven goals to execute
+  steps:
+  - name: mvn-settings
+    # Prepare a settings.xml if provided in the workspace
+    image: registry.access.redhat.com/ubi8/ubi-minimal:8.2
+    script: |
+      if [[ -f $(workspaces.maven-settings.path)/settings.xml ]]; then
+        echo "Using existing settings.xml"
+      else
+        # Create default settings.xml (no-op or copy defaults)
+        echo "<settings></settings>" > $(workspaces.maven-settings.path)/settings.xml
+      fi
+  - name: mvn-build
+    image: maven:3.6-jdk-11
+    workingDir: $(workspaces.source.path)
+    script: |
+      mvn -B -s $(workspaces.maven-settings.path)/settings.xml $(params.GOALS)

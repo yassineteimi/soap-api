@@ -1,0 +1,20 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: apply-manifests
+spec:
+  description: Apply Kubernetes manifest files from a directory in the workspace.
+  workspaces:
+  - name: source
+    description: Source workspace containing manifests (e.g. k8s/)
+  params:
+  - name: manifest_dir
+    type: string
+    default: "k8s"
+    description: Directory under source workspace with YAML manifests.
+  steps:
+  - name: apply
+    image: registry.redhat.io/openshift4/ocp-release:latest
+    script: |
+      echo "Applying manifests in $(inputs.params.manifest_dir)"
+      oc apply -f $(workspaces.source.path)/$(inputs.params.manifest_dir)

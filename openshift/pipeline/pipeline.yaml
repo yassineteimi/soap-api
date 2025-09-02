@@ -1,0 +1,91 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: soap-api-pipeline
+  namespace: soap-api
+spec:
+  # Workspaces to share among tasks
+  workspaces:
+  - name: shared-workspace
+    description: Workspace for source code and artifacts
+  - name: maven-settings
+    description: Workspace for Maven settings (settings.xml)
+  params:
+  - name: git-url
+    type: string
+    description: URL of the Git repository
+  - name: git-revision
+    type: string
+    description: Git revision (branch or tag)
+    default: "main"
+  - name: IMAGE
+    type: string
+    description: Full image pull spec (e.g. image-registry.openshift-image-registry.svc:5000/soap-api/soap-api:latest)
+  - name: deployment-name
+    type: string
+    description: Name of the Kubernetes Deployment (container) to update
+  tasks:
+  - name: fetch-repo
+    taskRef:
+      name: git-clone       # uses cluster Task
+      kind: ClusterTask
+    workspaces:
+    - name: output
+      workspace: shared-workspace
+    params:
+    - name: url
+      value: $(params.git-url)
+    - name: revision
+      value: $(params.git-revision)
+    - name: deleteExisting
+      value: "true"
+  - name: maven-build
+    taskRef:
+      name: maven           # custom Task installed from catalog
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+    - name: maven-settings
+      workspace: maven-settings
+    params:
+    - name: GOALS
+      value:
+      - clean
+      - package
+    runAfter:
+    - fetch-repo
+  - name: build-image
+    taskRef:
+      name: buildah         # cluster Task installed by Pipelines operator
+      kind: ClusterTask
+    params:
+    - name: IMAGE
+      value: $(params.IMAGE)
+    - name: DOCKERFILE
+      value: $(workspaces.shared-workspace.path)/Dockerfile
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+    runAfter:
+    - maven-build
+  - name: apply-manifests
+    taskRef:
+      name: apply-manifests  # custom Task
+    workspaces:
+    - name: source
+      workspace: shared-workspace
+    params:
+    - name: manifest_dir
+      value: "k8s"
+    runAfter:
+    - build-image
+  - name: update-deployment
+    taskRef:
+      name: update-deployment  # custom Task
+    params:
+    - name: deployment
+      value: $(params.deployment-name)
+    - name: IMAGE
+      value: $(params.IMAGE)
+    runAfter:
+    - apply-manifests

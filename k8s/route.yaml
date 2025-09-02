@@ -1,0 +1,13 @@
+# inventory-route.yaml (optional, for external access in OpenShift)
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: inventory-route
+spec:
+  to:
+    kind: Service
+    name: inventory-service
+  port:
+    targetPort: soap
+  tls:
+    termination: edge
