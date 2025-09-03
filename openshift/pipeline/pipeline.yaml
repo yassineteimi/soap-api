@@ -42,7 +42,7 @@ spec:
   - name: maven-build
     taskRef:
       apiVersion: tekton.dev/v1alpha1
-      kind: mavenBuild
+      kind: Task
       name: maven           # custom Task installed from catalog
     workspaces:
     - name: source
@@ -73,7 +73,7 @@ spec:
   - name: apply-manifests
     taskRef:
       apiVersion: tekton.dev/v1alpha1
-      kind: manifestsTask
+      kind: Task
       name: apply-manifests  # custom Task
     workspaces:
     - name: source
@@ -86,7 +86,7 @@ spec:
   - name: update-deployment
     taskRef:
       apiVersion: tekton.dev/v1alpha1
-      kind: deploymentTask
+      kind: Task
       name: update-deployment  # custom Task
     params:
     - name: deployment
