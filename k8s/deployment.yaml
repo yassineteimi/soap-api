@@ -15,6 +15,6 @@ spec:
     spec:
       containers:
       - name: soap-api
-        image: image-registry.openshift-image-registry.svc:5000/soap-api/soap-api:latest
+        image: image-registry-operator.openshift-image-registry.svc:60000/soap-api/soap-api:latest
         ports:
         - containerPort: 8080

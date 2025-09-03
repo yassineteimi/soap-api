@@ -25,6 +25,6 @@ spec:
   - name: git-revision
     value: main
   - name: IMAGE
-    value: image-registry.openshift-image-registry.svc:5000/soap-api/soap-api:latest
+    value: image-registry-operator.openshift-image-registry.svc:60000/soap-api/soap-api:latest
   - name: deployment-name
     value: soap-api
