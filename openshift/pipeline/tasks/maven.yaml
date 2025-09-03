@@ -11,8 +11,8 @@ spec:
     description: Workspace for custom Maven settings (optional)
   params:
   - name: GOALS
-    type: array
-    default: ["package"]
+    type: string
+    default: "clean package"
     description: Maven goals to execute
   steps:
   - name: mvn-settings

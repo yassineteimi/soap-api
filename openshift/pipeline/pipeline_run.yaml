@@ -21,7 +21,7 @@ spec:
         resources: {requests: {storage: 100Mi}}
   params:
   - name: git-url
-    value: https://github.com/myuser/soap-api.git
+    value: https://github.com/yassineteimi/soap-api.git
   - name: git-revision
     value: main
   - name: IMAGE
