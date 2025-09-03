@@ -27,7 +27,9 @@ spec:
   tasks:
   - name: fetch-repo
     taskRef:
-      name: git-clone       # uses cluster Task
+      apiVersion: tekton.dev/v1beta1
+      kind: Task
+      name: git-clone       # custom Task
     workspaces:
     - name: output
       workspace: shared-workspace
@@ -42,7 +44,7 @@ spec:
     taskRef:
       apiVersion: tekton.dev/v1beta1
       kind: Task
-      name: maven           # custom Task installed from catalog
+      name: maven     # custom Task installed from catalog
     workspaces:
     - name: source
       workspace: shared-workspace
@@ -57,7 +59,9 @@ spec:
     - fetch-repo
   - name: build-image
     taskRef:
-      name: buildah         # cluster Task installed by Pipelines operator
+      apiVersion: tekton.dev/v1beta1
+      kind: Task
+      name: buildah     # custom Task
     params:
     - name: IMAGE
       value: $(params.IMAGE)

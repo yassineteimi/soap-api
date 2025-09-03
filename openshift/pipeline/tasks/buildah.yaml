@@ -1,0 +1,23 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: buildah
+  namespace: soap-api
+spec:
+  description: Build and push image using Buildah.
+  workspaces:
+    - name: source
+      description: Workspace containing source code and Dockerfile
+  params:
+    - name: IMAGE
+      type: string
+      description: Full image pull spec (including registry, namespace, repo, tag)
+    - name: DOCKERFILE
+      type: string
+      description: Path to the Dockerfile
+  steps:
+    - name: build
+      image: quay.io/buildah/stable:latest
+      script: |
+        buildah bud -f $(params.DOCKERFILE) -t $(params.IMAGE) $(workspaces.source.path)
+        buildah push $(params.IMAGE)
