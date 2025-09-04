@@ -62,9 +62,14 @@ spec:
     - fetch-repo
   - name: build-image
     taskRef:
-      apiVersion: tekton.dev/v1beta1
-      kind: Task
-      name: buildah     # custom Task
+      resolver: cluster
+      params:
+        - name: namespace
+          value: openshift-pipelines
+        - name: kind
+          value: task
+        - name: name
+          value: buildah
     params:
     - name: IMAGE
       value: $(params.IMAGE)
