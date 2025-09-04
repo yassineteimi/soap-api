@@ -32,7 +32,7 @@ spec:
         - name: namespace
           value: openshift-pipelines
         - name: kind
-          value: Task
+          value: task
         - name: name
           value: git-clone  # custom Task installed from catalog
     workspaces:
